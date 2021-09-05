@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@material-ui/icons";
 import { sliderItems } from "../fakeData";
 import { useState } from "react";
-import { Mobile } from "../Reponsive";
+import { Mobile, Tablet } from "../Reponsive";
 
 function Slider() {
   const [slideIndex, setSlideIndex] = useState(0);
@@ -92,10 +92,16 @@ const ImgContainer = styled.div`
   height: 100%;
   flex: 1;
   flex-grow: 1;
+  ${Tablet({
+    display: "none",
+  })}
 `;
 
 const Image = styled.img`
   height: 80%;
+  ${Tablet({
+    width: "100%",
+  })}
 `;
 
 const InfoContainer = styled.div`

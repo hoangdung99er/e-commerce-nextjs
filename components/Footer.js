@@ -9,7 +9,7 @@ import {
   Phone,
   Mail,
 } from "@material-ui/icons";
-import { Mobile } from "../Reponsive";
+import { Mobile, Tablet } from "../Reponsive";
 
 function Footer() {
   return (
@@ -77,6 +77,9 @@ export default Footer;
 const Container = styled.div`
   display: flex;
   ${Mobile({
+    flexDirection: "column",
+  })}
+  ${Tablet({
     flexDirection: "column",
   })}
 `;

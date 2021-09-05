@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Search, ShoppingCartOutlined } from "@material-ui/icons";
 import { Badge } from "@material-ui/core";
-import { Mobile } from "../Reponsive";
+import { Mobile, Tablet } from "../Reponsive";
 
 function Header() {
   return (
@@ -65,12 +65,18 @@ const Input = styled.input`
   ${Mobile({
     width: "50px",
   })}
+  ${Mobile({
+    width: "60px",
+  })}
 `;
 
 const Language = styled.span`
   font-size: 14px;
   cursor: pointer;
   ${Mobile({
+    display: "none",
+  })}
+  ${Tablet({
     display: "none",
   })}
 `;
