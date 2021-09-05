@@ -65,7 +65,7 @@ const Input = styled.input`
   ${Mobile({
     width: "50px",
   })}
-  ${Mobile({
+  ${Tablet({
     width: "60px",
   })}
 `;
@@ -87,6 +87,12 @@ const SearchContainer = styled.div`
   align-items: center;
   margin-left: 25px;
   padding: 5px;
+  ${Mobile({
+    marginLeft: "25px",
+  })}
+  ${Tablet({
+    marginLeft: "0",
+  })}
 `;
 
 const Center = styled.div`
