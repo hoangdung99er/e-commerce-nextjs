@@ -1,8 +1,31 @@
 import styled from "styled-components";
 import Head from "next/head";
 import { Mobile } from "../Reponsive";
+import { useState } from "react";
+import Link from "next/link";
+import { onSignIn } from "../store/actions/authAction";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import { loading } from "../store/reducers/user";
 
-function login() {
+function Login() {
+  const [user, setUser] = useState({ username: "", password: "" });
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const isLoading = useSelector(loading);
+
+  //Set value for state
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
+  // Handle Submit form login
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    dispatch(onSignIn(user, router));
+  };
+
   return (
     <Container>
       <Head>
@@ -10,19 +33,52 @@ function login() {
       </Head>
       <Wrapper>
         <Title>SIGN IN</Title>
-        <Form>
-          <Input placeholder="Username" />
-          <Input placeholder="Password" />
-          <Button>Login</Button>
-          <Link>Remember the password?</Link>
-          <Link>Create a new account</Link>
+        <Form onSubmit={handleSubmit}>
+          <Input
+            placeholder="Username"
+            name="username"
+            id="username"
+            value={user.username}
+            onChange={handleChange}
+            type="text"
+          />
+          <Input
+            placeholder="Password"
+            name="password"
+            id="password"
+            value={user.password}
+            onChange={handleChange}
+            type="password"
+          />
+          <Button type="submit">Login</Button>
+          <LinkRef href="/">Remember the password?</LinkRef>
+          <LinkRef href="/register">Create a new account</LinkRef>
         </Form>
       </Wrapper>
     </Container>
   );
 }
 
-export default login;
+export default Login;
+
+export async function getServerSideProps(context) {
+  const tokenCookie = context?.req?.cookies.token;
+
+  if (tokenCookie) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      tokenCookie: tokenCookie || null,
+    },
+  };
+}
 
 const Container = styled.div`
   width: 100vw;
@@ -75,7 +131,7 @@ const Button = styled.button`
   margin-bottom: 10px;
 `;
 
-const Link = styled.a`
+const LinkRef = styled(Link)`
   margin: 5px 0;
   font-size: 12px;
   text-decoration: underline;

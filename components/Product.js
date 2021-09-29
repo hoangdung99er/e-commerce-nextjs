@@ -5,8 +5,10 @@ import {
 } from "@material-ui/icons";
 import { Mobile } from "../Reponsive";
 import styled from "styled-components";
+import { useRouter } from "next/router";
 
 function Product({ item }) {
+  const router = useRouter();
   return (
     <Container>
       <Circle />
@@ -15,7 +17,7 @@ function Product({ item }) {
         <Icon>
           <ShoppingCartOutlined />
         </Icon>
-        <Icon>
+        <Icon onClick={() => router.push(`/product/${item._id}`)}>
           <SearchOutlined />
         </Icon>
         <Icon>

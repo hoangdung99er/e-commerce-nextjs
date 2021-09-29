@@ -2,30 +2,66 @@ import styled from "styled-components";
 import { Search, ShoppingCartOutlined } from "@material-ui/icons";
 import { Badge } from "@material-ui/core";
 import { Mobile, Tablet } from "../Reponsive";
+import { useRouter } from "next/router";
+import cookie from "js-cookie";
+import { cart } from "../store/reducers/cart";
+import { useSelector } from "react-redux";
 
-function Header() {
+function Header({ tokenCookie, decodedSwr }) {
+  const router = useRouter();
+  const handleLogout = () => {
+    cookie.remove("token");
+    router.push("/login");
+  };
+  const cartAction = useSelector(cart);
+
+  console.log(cartAction);
+
   return (
     <div>
       <Container>
         <Wrapper>
-          <Left>
-            <Language>EN</Language>
-            <SearchContainer>
-              <Input placeholder="Search" />
-              <Search style={{ color: "gray", fontSize: 16 }} />
-            </SearchContainer>
-          </Left>
+          {!decodedSwr?.isAdmin && (
+            <Left>
+              <Language>EN</Language>
+              <SearchContainer>
+                <Input placeholder="Search" />
+                <Search style={{ color: "gray", fontSize: 16 }} />
+              </SearchContainer>
+            </Left>
+          )}
           <Center>
-            <Logo>Rex</Logo>
+            <Logo onClick={() => router.push("/")}>
+              {decodedSwr?.isAdmin ? "Rex's Admin" : "Rex"}
+            </Logo>
           </Center>
           <Right>
-            <MenuItem>REGISTER</MenuItem>
-            <MenuItem>SIGN IN</MenuItem>
-            <MenuItem>
-              <Badge badgeContent={4} color="primary">
-                <ShoppingCartOutlined />
-              </Badge>
-            </MenuItem>
+            {tokenCookie ? (
+              <>
+                {decodedSwr?.isAdmin ? (
+                  <MenuItem onClick={() => router.push("/admin")}>
+                    ADMIN PANEL
+                  </MenuItem>
+                ) : (
+                  <MenuItem onClick={() => router.push("/cart")}>
+                    <Badge badgeContent={4} color="primary">
+                      <ShoppingCartOutlined />
+                    </Badge>
+                  </MenuItem>
+                )}
+
+                <MenuItem onClick={handleLogout}>LOG OUT</MenuItem>
+              </>
+            ) : (
+              <>
+                <MenuItem onClick={() => router.push("/register")}>
+                  REGISTER
+                </MenuItem>
+                <MenuItem onClick={() => router.push("/login")}>
+                  SIGN IN
+                </MenuItem>
+              </>
+            )}
           </Right>
         </Wrapper>
       </Container>

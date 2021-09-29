@@ -28,6 +28,26 @@ function Register() {
 }
 
 export default Register;
+
+export async function getServerSideProps(context) {
+  const tokenCookie = context?.req?.cookies.token;
+
+  if (tokenCookie) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      tokenCookie: tokenCookie || null,
+    },
+  };
+}
+
 import { Mobile } from "../Reponsive";
 
 const Container = styled.div`

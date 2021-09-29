@@ -10,8 +10,9 @@ import {
   Newletter,
   Footer,
 } from "../components";
+import jwt_decode from "jwt-decode";
 
-export default function Home() {
+export default function Home({ tokenCookie, decodedSwr }) {
   return (
     <Container>
       <Head>
@@ -20,7 +21,7 @@ export default function Home() {
       </Head>
 
       <Announcement />
-      <Header />
+      <Header tokenCookie={tokenCookie} decodedSwr={decodedSwr} />
       <Slider />
       <Categories />
       <Products />
@@ -34,3 +35,15 @@ const Container = styled.div`
   width: 100%;
   height: 100vh;
 `;
+
+export async function getServerSideProps(context) {
+  const tokenCookie = context?.req?.cookies.token;
+  const decoded = tokenCookie && (await jwt_decode(tokenCookie));
+
+  return {
+    props: {
+      tokenCookie: tokenCookie || null,
+      decodedSwr: decoded || null,
+    },
+  };
+}

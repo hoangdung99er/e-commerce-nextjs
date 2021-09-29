@@ -1,12 +1,26 @@
 import styled from "styled-components";
-import { popularProducts } from "../fakeData";
 import { Product } from "../components";
+import { useEffect, useCallback, useState } from "react";
+import { onGetAllProduct } from "../store/actions/productAction";
+import { useDispatch } from "react-redux";
 
 function Products() {
+  const dispatch = useDispatch();
+  const [products, setProducts] = useState([]);
+
+  const fetchProduct = useCallback(async () => {
+    const data = await dispatch(onGetAllProduct());
+    setProducts(data);
+  }, [dispatch]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
+
   return (
     <Container>
-      {popularProducts.map((item) => (
-        <Product item={item} key={item.id} />
+      {products?.map((item) => (
+        <Product item={item} key={item._id} />
       ))}
     </Container>
   );
