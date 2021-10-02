@@ -10,17 +10,22 @@ import Head from "next/head";
 import { Mobile } from "../Reponsive";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { useRequestApi } from "../store/lib/useRequest";
 
 function ProductLists() {
   const [filters, setFilters] = useState({});
-  const [sort, setSort] = useState("newest");
   const router = useRouter();
-  const { category } = router.query || null;
+  const category = router.query.category || "";
+  const { data, error } = useRequestApi(`/product/all?category=${category}`);
+  const [sort, setSort] = useState("newest");
 
   const handleFilters = (e) => {
     const value = e.target.value;
     setFilters({ ...filters, [e.target.name]: value });
   };
+
+  if (error) return <h1>Something went wrong!</h1>;
+  if (!data) return <h1>Loading...</h1>;
 
   return (
     <Container>
@@ -59,7 +64,12 @@ function ProductLists() {
           </Select>
         </Filter>
       </FilterContainer>
-      <Products category={category} sort={sort} filters={filters} />
+      <Products
+        category={category}
+        sort={sort}
+        filters={filters}
+        products={data}
+      />
       <Newletter />
       <Footer />
     </Container>

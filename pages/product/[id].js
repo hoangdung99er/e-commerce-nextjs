@@ -9,7 +9,6 @@ import callApi from "../../store/lib/apiCall";
 import { onCreateCart } from "../../store/actions/cartAction";
 import { useDispatch } from "react-redux";
 import { addProduct } from "../../store/reducers/cart";
-import { initialiseStore } from "../../store";
 
 function ProductDetail({ tokenCookie, decodedSwr, product }) {
   const newColor = product?.color?.split(",");
@@ -64,7 +63,6 @@ function ProductDetail({ tokenCookie, decodedSwr, product }) {
   const handleAddCart = () => {
     // dispatch(
     //   onCreateCart(newProduct, quantity, decodedSwr?.userId, tokenCookie)
-    // );
     dispatch(
       addProduct({ quantity, newProduct, price: product?.price * quantity })
     );

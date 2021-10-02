@@ -11,8 +11,14 @@ import {
   Footer,
 } from "../components";
 import jwt_decode from "jwt-decode";
+import { useRequestApi } from "../store/lib/useRequest";
 
 export default function Home({ tokenCookie, decodedSwr }) {
+  const { data, error } = useRequestApi("/product/all");
+
+  if (error) return <h1>Something went wrong!</h1>;
+  if (!data) return <h1>Loading...</h1>;
+  console.log(error);
   return (
     <Container>
       <Head>
@@ -24,7 +30,7 @@ export default function Home({ tokenCookie, decodedSwr }) {
       <Header tokenCookie={tokenCookie} decodedSwr={decodedSwr} />
       <Slider />
       <Categories />
-      <Products filters={{}} />
+      <Products filters={{}} products={data} />
       <Newletter />
       <Footer />
     </Container>

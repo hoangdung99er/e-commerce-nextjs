@@ -7,24 +7,20 @@ import EditProductAdmin from "../components/Admin/EditProduct";
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { onGetAllProduct } from "../store/actions/productAction";
+import { useRequestApi } from "../store/lib/useRequest";
 
 function Admin({ tokenCookie, decodedSwr }) {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [pid, setPId] = useState(null);
-
-  const fetchProduct = useCallback(async () => {
-    const products = await dispatch(onGetAllProduct());
-    setProducts(products);
-  }, [dispatch]);
-
-  useEffect(() => {
-    fetchProduct();
-  }, [fetchProduct, pid]);
+  const { data, error } = useRequestApi("/product/all");
 
   const handleId = (id) => {
     setPId(id);
   };
+
+  if (error) return <h1>Something went wrong...</h1>;
+  if (!data) return <h1>Loading...</h1>;
 
   return (
     <Container>
@@ -35,7 +31,7 @@ function Admin({ tokenCookie, decodedSwr }) {
 
       <Header tokenCookie={tokenCookie} decodedSwr={decodedSwr} />
       <ProductsAdmin
-        products={products}
+        products={data}
         handleId={handleId}
         tokenCookie={tokenCookie}
         setProducts={setProducts}
@@ -43,7 +39,7 @@ function Admin({ tokenCookie, decodedSwr }) {
       {pid && (
         <EditProductAdmin
           pid={pid}
-          products={products}
+          products={data}
           setPId={setPId}
           tokenCookie={tokenCookie}
         />

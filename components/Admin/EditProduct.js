@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { onEditProduct } from "../../store/actions/productAction";
+import { mutate } from "swr";
 
 function EditProduct({ products, pid, tokenCookie, setPId }) {
   const [product, setProduct] = useState({
@@ -14,7 +15,7 @@ function EditProduct({ products, pid, tokenCookie, setPId }) {
     categories: "",
     size: "",
     color: "",
-    price: "",
+    price: 0,
   });
   const dispatch = useDispatch();
 
@@ -24,10 +25,18 @@ function EditProduct({ products, pid, tokenCookie, setPId }) {
   };
 
   // Handle Submit form login
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    dispatch(onEditProduct(product, pid, tokenCookie));
+    mutate(
+      "http://localhost:3000/api/product/all",
+      [...products, product],
+      false
+    );
+
+    await dispatch(onEditProduct(product, pid, tokenCookie));
+
+    mutate("http://localhost:3000/api/product/all");
 
     setProduct("");
     setPId(null);
@@ -107,7 +116,7 @@ function EditProduct({ products, pid, tokenCookie, setPId }) {
   );
 }
 
-export default EditProduct;
+export default React.memo(EditProduct);
 
 const Container = styled.div`
   width: 100%;

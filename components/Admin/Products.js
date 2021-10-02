@@ -1,8 +1,9 @@
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { mutate } from "swr";
 import { onDeleteProduct } from "../../store/actions/productAction";
 
 function Products({ products, handleId, tokenCookie, setProducts }) {
@@ -93,11 +94,20 @@ function Products({ products, handleId, tokenCookie, setProducts }) {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const handleDelete = async (id) => {
-    const data = await dispatch(onDeleteProduct(id, tokenCookie));
+  const handleDelete = useCallback(
+    async (id) => {
+      const fetcher = () => {
+        setTimeout(() => {
+          products.filter((product) => product._id !== id);
+        });
+      };
+      mutate("http://localhost:3000/api/product/all", fetcher);
+      await dispatch(onDeleteProduct(id, tokenCookie));
 
-    data && setProducts(products.filter((product) => product._id !== id));
-  };
+      mutate("http://localhost:3000/api/product/all");
+    },
+    [dispatch, products, tokenCookie]
+  );
 
   return (
     <div>
@@ -113,7 +123,7 @@ function Products({ products, handleId, tokenCookie, setProducts }) {
           rows={products}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
-          getRowId={(row) => row._id}
+          getRowId={(row) => row?._id}
           disableColumnSelector
         />
       </div>

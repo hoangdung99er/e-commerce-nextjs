@@ -41,11 +41,13 @@ export const onGetAllProduct = (category) => {
 export const onEditProduct = (product, pid, token) => {
   return async (dispatch) => {
     try {
-      await apiCall(`product/${pid}`, "PUT", product, {
+      const response =  await apiCall(`product/${pid}`, "PUT", product, {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       });
+
+      return response;
     } catch (error) {
       console.log(error);
     }

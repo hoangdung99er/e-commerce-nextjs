@@ -1,11 +1,12 @@
 import styled from "styled-components";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@material-ui/icons";
 import { sliderItems } from "../fakeData";
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Mobile, Tablet } from "../Reponsive";
 
 function Slider() {
   const [slideIndex, setSlideIndex] = useState(0);
+  const arrowRef = useRef(null);
 
   const handleClick = (direction) => {
     if (direction === "left") {
@@ -14,6 +15,23 @@ function Slider() {
       setSlideIndex(slideIndex < 2 ? slideIndex + 1 : 0);
     }
   };
+
+  function resetTimeout() {
+    if (arrowRef.current) {
+      clearTimeout(arrowRef.current);
+    }
+  }
+
+  useEffect(() => {
+    resetTimeout();
+    const timer = setTimeout(() => {
+      arrowRef.current.click();
+    }, 5000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [slideIndex]);
 
   return (
     <Container>
@@ -34,7 +52,11 @@ function Slider() {
           </Slide>
         ))}
       </Wrapper>
-      <Arrow direction="right" onClick={() => handleClick("right")}>
+      <Arrow
+        ref={arrowRef}
+        direction="right"
+        onClick={() => handleClick("right")}
+      >
         <ArrowRightOutlined />
       </Arrow>
     </Container>
