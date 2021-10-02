@@ -14,7 +14,7 @@ async function handler(req, res) {
 
   switch (method) {
     case "GET":
-      if (req.auth.id === userId || req.auth.isAdmin) {
+      if (req.auth) {
         try {
           const carts = await Cart.find({});
 

@@ -4,8 +4,9 @@ import { Badge } from "@material-ui/core";
 import { Mobile, Tablet } from "../Reponsive";
 import { useRouter } from "next/router";
 import cookie from "js-cookie";
-import { cart } from "../store/reducers/cart";
+import { quantity } from "../store/reducers/cart";
 import { useSelector } from "react-redux";
+import React from "react";
 
 function Header({ tokenCookie, decodedSwr }) {
   const router = useRouter();
@@ -13,9 +14,7 @@ function Header({ tokenCookie, decodedSwr }) {
     cookie.remove("token");
     router.push("/login");
   };
-  const cartAction = useSelector(cart);
-
-  console.log(cartAction);
+  const quantityAction = useSelector(quantity);
 
   return (
     <div>
@@ -44,7 +43,7 @@ function Header({ tokenCookie, decodedSwr }) {
                   </MenuItem>
                 ) : (
                   <MenuItem onClick={() => router.push("/cart")}>
-                    <Badge badgeContent={4} color="primary">
+                    <Badge badgeContent={quantityAction} color="primary">
                       <ShoppingCartOutlined />
                     </Badge>
                   </MenuItem>
@@ -69,7 +68,7 @@ function Header({ tokenCookie, decodedSwr }) {
   );
 }
 
-export default Header;
+export default React.memo(Header);
 
 const Container = styled.div`
   height: 60px;

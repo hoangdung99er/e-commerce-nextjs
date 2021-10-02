@@ -9,7 +9,7 @@ export const onCreateCart = (product, quantity, userId, token) => {
   return async (dispatch) => {
     try {
       const response = await apiCall(
-        "cart/create",
+        `cart/create`,
         "POST",
         {
           product,
@@ -35,7 +35,6 @@ export const onGetCart = (token) => {
         Authorization: "Bearer " + token,
       });
 
-      console.log(response);
       dispatch(getCart(response));
     } catch (error) {
       console.log(error);

@@ -24,7 +24,7 @@ export default function Home({ tokenCookie, decodedSwr }) {
       <Header tokenCookie={tokenCookie} decodedSwr={decodedSwr} />
       <Slider />
       <Categories />
-      <Products />
+      <Products filters={{}} />
       <Newletter />
       <Footer />
     </Container>

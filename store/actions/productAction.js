@@ -23,10 +23,12 @@ export const onCreateProduct = (product, router, token) => {
   };
 };
 
-export const onGetAllProduct = () => {
+export const onGetAllProduct = (category) => {
   return async (dispatch) => {
     try {
-      const response = await apiCall("product/all");
+      const response = category
+        ? await apiCall(`product/all?category=${category}`)
+        : await apiCall(`product/all`);
 
       dispatch(getAllProducts(response));
       return response;

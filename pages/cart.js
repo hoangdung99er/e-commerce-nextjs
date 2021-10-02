@@ -4,14 +4,15 @@ import { Header, Announcement, Footer } from "../components";
 import { Mobile } from "../Reponsive";
 import Head from "next/head";
 
-function Cart() {
+function Cart({ tokenCookie, decodedSwr }) {
   return (
     <>
       <Head>
         <title>Shopping Cart</title>
       </Head>
       <Announcement />
-      <Header />
+      <Header tokenCookie={tokenCookie} decodedSwr={decodedSwr} />
+
       <Wrapper>
         <Title>YOUR BAG</Title>
         <Top>
@@ -109,6 +110,18 @@ function Cart() {
 }
 
 export default Cart;
+
+export async function getServerSideProps(context) {
+  const tokenCookie = context?.req?.cookies.token;
+  const decoded = tokenCookie && (await jwt_decode(tokenCookie));
+
+  return {
+    props: {
+      tokenCookie: tokenCookie || null,
+      decodedSwr: decoded || null,
+    },
+  };
+}
 
 const Wrapper = styled.div`
   padding: 20px;

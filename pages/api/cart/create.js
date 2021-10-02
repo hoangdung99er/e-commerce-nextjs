@@ -13,7 +13,6 @@ async function handler(req, res) {
   } = req;
   switch (method) {
     case "POST":
-      console.log(product);
       const newCart = new Cart({
         userId: userId,
         products: [
@@ -32,14 +31,6 @@ async function handler(req, res) {
           },
         ],
       });
-
-      let cart;
-
-      try {
-        cart = await Cart.find({});
-      } catch (error) {
-        res.status(500).json(error);
-      }
 
       if (req.auth) {
         try {

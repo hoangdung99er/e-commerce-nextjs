@@ -8,8 +8,20 @@ import {
 } from "../components";
 import Head from "next/head";
 import { Mobile } from "../Reponsive";
+import { useState } from "react";
+import { useRouter } from "next/router";
 
 function ProductLists() {
+  const [filters, setFilters] = useState({});
+  const [sort, setSort] = useState("newest");
+  const router = useRouter();
+  const { category } = router.query || null;
+
+  const handleFilters = (e) => {
+    const value = e.target.value;
+    setFilters({ ...filters, [e.target.name]: value });
+  };
+
   return (
     <Container>
       <Head>
@@ -21,40 +33,33 @@ function ProductLists() {
       <FilterContainer>
         <Filter>
           <FilterText>Filter Products</FilterText>
-          <Select>
-            <Option disabled selected>
-              Color
-            </Option>
-            <Option>White</Option>
-            <Option>Black</Option>
-            <Option>Red</Option>
-            <Option>Blue</Option>
-            <Option>Yellow</Option>
-            <Option>Green</Option>
-            <Option>Red Formula</Option>
+          <Select name="color" onChange={handleFilters}>
+            <Option disabled>Color</Option>
+            <Option value="white">White</Option>
+            <Option value="black">Black</Option>
+            <Option value="red">Red</Option>
+            <Option value="blue">Blue</Option>
+            <Option value="yellow">Yellow</Option>
+            <Option value="green">Green</Option>
           </Select>
-          <Select>
-            <Option disabled selected>
-              Size
-            </Option>
-            <Option>XS</Option>
-            <Option>S</Option>
-            <Option>M</Option>
-            <Option>L</Option>
-            <Option>XL</Option>
-            <Option>XXL</Option>
+          <Select name="size" onChange={handleFilters}>
+            <Option disabled>Size</Option>
+            <Option value="XS">XS</Option>
+            <Option value="S">S</Option>
+            <Option value="M">M</Option>
+            <Option value="L">L</Option>
+            <Option value="XL">XL</Option>
+            <Option value="XXL">XXL</Option>
           </Select>
           <FilterText>Sort Products</FilterText>
-          <Select>
-            <Option disabled selected>
-              Newest
-            </Option>
-            <Option>Price (asc)</Option>
-            <Option>Price (desc)</Option>
+          <Select onChange={(e) => setSort(e.target.value)}>
+            <Option value="newest">Newest</Option>
+            <Option value="asc">Price (asc)</Option>
+            <Option value="desc">Price (desc)</Option>
           </Select>
         </Filter>
       </FilterContainer>
-      <Products />
+      <Products category={category} sort={sort} filters={filters} />
       <Newletter />
       <Footer />
     </Container>
