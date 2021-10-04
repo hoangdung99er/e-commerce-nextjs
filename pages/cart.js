@@ -4,14 +4,43 @@ import { Header, Announcement, Footer } from "../components";
 import { Mobile } from "../Reponsive";
 import Head from "next/head";
 import { useSelector } from "react-redux";
-import { products, total } from "../store/reducers/cart";
+import { products, total, quantity } from "../store/reducers/cart";
 import jwt_decode from "jwt-decode";
+import { useRouter } from "next/router";
+import { Button } from "@mui/material";
+import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
 
 let SHIPPING_FEE = 2;
 
 function Cart({ tokenCookie, decodedSwr }) {
   const productsAction = useSelector(products);
+  const quantityAction = useSelector(quantity);
   const total_Cart = useSelector(total);
+  const router = useRouter();
+  const SERVER_DOMAIN = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
+
+  const createCheckoutSession = async () => {
+    const stripe = await stripePromise;
+
+    const checkoutSession = await axios({
+      method: "post",
+      url: `${SERVER_DOMAIN}/stripe/payment`,
+      data: { items: productsAction },
+      headers: {
+        Authorization: "Bearer " + process.env.NEXT_PUBLIC_STRIPE_PR_KEY,
+      },
+    });
+
+    const result = await stripe.redirectToCheckout({
+      sessionId: checkoutSession.data.id,
+    });
+
+    if (result.error) {
+      alert(result.error.message);
+    }
+  };
 
   console.log(productsAction);
   return (
@@ -25,45 +54,50 @@ function Cart({ tokenCookie, decodedSwr }) {
       <Wrapper>
         <Title>YOUR BAG</Title>
         <Top>
-          <TopButton>CONTINUE SHOPPING</TopButton>
+          <TopButton onClick={() => router.replace("/products")}>
+            CONTINUE SHOPPING
+          </TopButton>
           <TopTexts>
-            <TopText>Shopping Bag(2)</TopText>
+            <TopText>Shopping Bag({quantityAction})</TopText>
             <TopText>Your Wishlist(0)</TopText>
           </TopTexts>
-          <TopButton type="filled">CHECKOUT NOW</TopButton>
         </Top>
         <Bottom>
           <Info>
-            {productsAction?.map(({ product, quantity }, i) => (
-              <Product key={i}>
-                <ProductDetail>
-                  <Image
-                    src="https://www.transparentpng.com/thumb/clothes/KaU7ZT-blue-women-dress-clothes-hd-image.png"
-                    alt=""
-                  />
-                  <Details>
-                    <ProductName>
-                      <b>Product:</b> {product.title}
-                    </ProductName>
-                    <ProductId>
-                      <b>ID:</b> {product.id}
-                    </ProductId>
-                    <ProductColor color="black" />
-                    <ProductSize>
-                      <b>Size:</b> {product.size}
-                    </ProductSize>
-                  </Details>
-                </ProductDetail>
-                <PriceDetail>
-                  <ProductAmountContainer>
-                    <Add />
-                    <Amount>{quantity}</Amount>
-                    <Remove />
-                  </ProductAmountContainer>
-                  <ProductPrice>$ {product.price}</ProductPrice>
-                </PriceDetail>
-              </Product>
-            ))}
+            {productsAction.length > 0 ? (
+              productsAction?.map(({ product, quantity }, i) => (
+                <Product key={i}>
+                  <ProductDetail>
+                    <Image
+                      src="https://www.transparentpng.com/thumb/clothes/KaU7ZT-blue-women-dress-clothes-hd-image.png"
+                      alt=""
+                    />
+                    <Details>
+                      <ProductName>
+                        <b>Product:</b> {product.title}
+                      </ProductName>
+                      <ProductId>
+                        <b>ID:</b> {product.id}
+                      </ProductId>
+                      <ProductColor color={product.color} />
+                      <ProductSize>
+                        <b>Size:</b> {product.size}
+                      </ProductSize>
+                    </Details>
+                  </ProductDetail>
+                  <PriceDetail>
+                    <ProductAmountContainer>
+                      <Add />
+                      <Amount>{quantity}</Amount>
+                      <Remove />
+                    </ProductAmountContainer>
+                    <ProductPrice>$ {product.price}</ProductPrice>
+                  </PriceDetail>
+                </Product>
+              ))
+            ) : (
+              <h1>Empty Cart</h1>
+            )}
           </Info>
           <Summary>
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
@@ -79,7 +113,16 @@ function Cart({ tokenCookie, decodedSwr }) {
               <SummaryItemText>Total</SummaryItemText>
               <SummaryItemPrice>$ {total_Cart + SHIPPING_FEE}</SummaryItemPrice>
             </SummaryItem>
-            <SummaryButton>CHECKOUT NOW</SummaryButton>
+            {tokenCookie && (
+              <Button
+                onClick={createCheckoutSession}
+                variant="contained"
+                color="primary"
+                fullWidth
+              >
+                CHECKOUT NOW
+              </Button>
+            )}
           </Summary>
         </Bottom>
       </Wrapper>

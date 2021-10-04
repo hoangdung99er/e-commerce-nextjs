@@ -5,13 +5,9 @@ import jwt_decode from "jwt-decode";
 import ProductsAdmin from "../components/Admin/Products";
 import EditProductAdmin from "../components/Admin/EditProduct";
 import React, { useEffect, useState, useCallback } from "react";
-import { useDispatch } from "react-redux";
-import { onGetAllProduct } from "../store/actions/productAction";
 import { useRequestApi } from "../store/lib/useRequest";
 
 function Admin({ tokenCookie, decodedSwr }) {
-  const dispatch = useDispatch();
-  const [products, setProducts] = useState([]);
   const [pid, setPId] = useState(null);
   const { data, error } = useRequestApi("/product/all");
 
@@ -34,7 +30,6 @@ function Admin({ tokenCookie, decodedSwr }) {
         products={data}
         handleId={handleId}
         tokenCookie={tokenCookie}
-        setProducts={setProducts}
       />
       {pid && (
         <EditProductAdmin

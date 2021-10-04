@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { mutate } from "swr";
 import { onDeleteProduct } from "../../store/actions/productAction";
 
-function Products({ products, handleId, tokenCookie, setProducts }) {
+function Products({ products, handleId, tokenCookie }) {
   const columns = [
     {
       field: "_id",

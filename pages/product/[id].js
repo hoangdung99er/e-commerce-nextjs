@@ -2,13 +2,12 @@ import { Add, Remove } from "@material-ui/icons";
 import styled from "styled-components";
 import { Header, Announcement, Newletter, Footer } from "../../components";
 import { Mobile, Tablet } from "../../Reponsive";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Head from "next/head";
 import jwt_decode from "jwt-decode";
 import callApi from "../../store/lib/apiCall";
-import { onCreateCart } from "../../store/actions/cartAction";
 import { useDispatch } from "react-redux";
-import { addProduct } from "../../store/reducers/cart";
+import { onAddCart } from "../../store/actions/cartAction";
 
 function ProductDetail({ tokenCookie, decodedSwr, product }) {
   const newColor = product?.color?.split(",");
@@ -61,10 +60,8 @@ function ProductDetail({ tokenCookie, decodedSwr, product }) {
   };
 
   const handleAddCart = () => {
-    // dispatch(
-    //   onCreateCart(newProduct, quantity, decodedSwr?.userId, tokenCookie)
     dispatch(
-      addProduct({ quantity, newProduct, price: product?.price * quantity })
+      onAddCart(newProduct, quantity, newProduct.id, product?.price * quantity)
     );
   };
 

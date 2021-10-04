@@ -6,13 +6,11 @@ import Link from "next/link";
 import { onSignIn } from "../store/actions/authAction";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { loading } from "../store/reducers/user";
 
 function Login() {
   const [user, setUser] = useState({ username: "", password: "" });
   const dispatch = useDispatch();
   const router = useRouter();
-  const isLoading = useSelector(loading);
 
   //Set value for state
   const handleChange = (e) => {

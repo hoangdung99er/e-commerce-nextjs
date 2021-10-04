@@ -1,9 +1,4 @@
 import apiCall from "../lib/apiCall";
-import {
-  onStartLoadingLoginState,
-  onEndLoadingLoginState,
-} from "../reducers/user";
-import { getAllProducts } from "../reducers/products";
 
 export const onCreateProduct = (product, router, token) => {
   return async (dispatch) => {
@@ -30,7 +25,6 @@ export const onGetAllProduct = (category) => {
         ? await apiCall(`product/all?category=${category}`)
         : await apiCall(`product/all`);
 
-      dispatch(getAllProducts(response));
       return response;
     } catch (error) {
       console.log(error);
@@ -41,7 +35,7 @@ export const onGetAllProduct = (category) => {
 export const onEditProduct = (product, pid, token) => {
   return async (dispatch) => {
     try {
-      const response =  await apiCall(`product/${pid}`, "PUT", product, {
+      const response = await apiCall(`product/${pid}`, "PUT", product, {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,

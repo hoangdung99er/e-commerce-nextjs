@@ -5,18 +5,7 @@ import { onGetAllProduct } from "../store/actions/productAction";
 import { useDispatch } from "react-redux";
 
 function Products({ category, filters, sort, products }) {
-  const dispatch = useDispatch();
-  // const [products, setProducts] = useState([]);
   const [filterProducts, setFilterProducts] = useState([]);
-
-  // const fetchProduct = useCallback(async () => {
-  //   const data = await dispatch(onGetAllProduct(category));
-  //   setProducts(data);
-  // }, [dispatch, category]);
-
-  // useEffect(() => {
-  //   fetchProduct();
-  // }, [fetchProduct]);
 
   useEffect(() => {
     setFilterProducts(

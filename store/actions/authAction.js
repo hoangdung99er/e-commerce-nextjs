@@ -1,14 +1,9 @@
 import apiCall from "../lib/apiCall";
 import cookie from "js-cookie";
-import {
-  onStartLoadingLoginState,
-  onEndLoadingLoginState,
-} from "../reducers/user";
 
 export const onSignIn = (user, router) => {
   return async (dispatch) => {
     try {
-      dispatch(onStartLoadingLoginState());
       const response = await apiCall("auth/login", "POST", user, {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -22,7 +17,6 @@ export const onSignIn = (user, router) => {
           path: "/",
         });
         router.push("/");
-        dispatch(onEndLoadingLoginState());
       }
     } catch (error) {
       console.log(error);

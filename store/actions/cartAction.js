@@ -1,9 +1,5 @@
 import apiCall from "../lib/apiCall";
-import {
-  onStartLoadingLoginState,
-  onEndLoadingLoginState,
-} from "../reducers/user";
-import { getCart } from "../reducers/cart";
+import * as types from "../constants/ActionTypes";
 
 export const onCreateCart = (product, quantity, userId, token) => {
   return async (dispatch) => {
@@ -35,9 +31,19 @@ export const onGetCart = (token) => {
         Authorization: "Bearer " + token,
       });
 
-      dispatch(getCart(response));
+      dispatch({});
     } catch (error) {
       console.log(error);
     }
   };
 };
+
+export const onAddCart = (newProduct, quantity, id, price) => ({
+  type: types.ADD_CART,
+  payload: {
+    newProduct,
+    quantity,
+    id,
+    price,
+  },
+});

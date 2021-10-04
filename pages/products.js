@@ -11,8 +11,9 @@ import { Mobile } from "../Reponsive";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useRequestApi } from "../store/lib/useRequest";
+import jwt_decode from "jwt-decode";
 
-function ProductLists() {
+function ProductLists({ tokenCookie, decodedSwr }) {
   const [filters, setFilters] = useState({});
   const router = useRouter();
   const category = router.query.category || "";
@@ -33,7 +34,7 @@ function ProductLists() {
         <title>Product Lists</title>
       </Head>
       <Announcement />
-      <Header />
+      <Header tokenCookie={tokenCookie} decodedSwr={decodedSwr} />
       <Title>Dresses</Title>
       <FilterContainer>
         <Filter>
@@ -74,6 +75,18 @@ function ProductLists() {
       <Footer />
     </Container>
   );
+}
+
+export async function getServerSideProps(context) {
+  const tokenCookie = context?.req?.cookies.token;
+  const decoded = tokenCookie && (await jwt_decode(tokenCookie));
+
+  return {
+    props: {
+      tokenCookie: tokenCookie || null,
+      decodedSwr: decoded || null,
+    },
+  };
 }
 
 export default ProductLists;
