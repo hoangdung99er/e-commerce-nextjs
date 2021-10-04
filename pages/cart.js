@@ -3,13 +3,14 @@ import styled from "styled-components";
 import { Header, Announcement, Footer } from "../components";
 import { Mobile } from "../Reponsive";
 import Head from "next/head";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { products, total, quantity } from "../store/reducers/cart";
 import jwt_decode from "jwt-decode";
 import { useRouter } from "next/router";
 import { Button } from "@mui/material";
 import { loadStripe } from "@stripe/stripe-js";
-import axios from "axios";
+import fetch from "isomorphic-unfetch";
+import { onAddQuantity, onRemoveItemCart } from "../store/actions/cartAction";
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
 
 let SHIPPING_FEE = 2;
@@ -19,30 +20,31 @@ function Cart({ tokenCookie, decodedSwr }) {
   const quantityAction = useSelector(quantity);
   const total_Cart = useSelector(total);
   const router = useRouter();
+  const dispatch = useDispatch();
   const SERVER_DOMAIN = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
 
   const createCheckoutSession = async () => {
     const stripe = await stripePromise;
 
-    const checkoutSession = await axios({
-      method: "post",
-      url: `${SERVER_DOMAIN}/stripe/payment`,
-      data: { items: productsAction },
+    const checkoutSession = await fetch(`${SERVER_DOMAIN}/stripe/payment`, {
+      method: "POST",
+      body: JSON.stringify({ items: productsAction }),
       headers: {
         Authorization: "Bearer " + process.env.NEXT_PUBLIC_STRIPE_PR_KEY,
+        "Content-Type": "application/json ",
       },
     });
 
     const result = await stripe.redirectToCheckout({
-      sessionId: checkoutSession.data.id,
+      sessionId: checkoutSession.id,
     });
 
     if (result.error) {
       alert(result.error.message);
     }
   };
-
   console.log(productsAction);
+
   return (
     <>
       <Head>
@@ -64,7 +66,7 @@ function Cart({ tokenCookie, decodedSwr }) {
         </Top>
         <Bottom>
           <Info>
-            {productsAction.length > 0 ? (
+            {productsAction?.length > 0 ? (
               productsAction?.map(({ product, quantity }, i) => (
                 <Product key={i}>
                   <ProductDetail>
@@ -87,12 +89,19 @@ function Cart({ tokenCookie, decodedSwr }) {
                   </ProductDetail>
                   <PriceDetail>
                     <ProductAmountContainer>
-                      <Add />
+                      <AddCustom
+                        onClick={() => dispatch(onAddQuantity(product.id))}
+                      />
                       <Amount>{quantity}</Amount>
-                      <Remove />
+                      <RemoveCustom
+                        onClick={() => dispatch(onRemoveItemCart(product.id))}
+                      />
                     </ProductAmountContainer>
                     <ProductPrice>$ {product.price}</ProductPrice>
                   </PriceDetail>
+                  <Button variant="contained" color="error">
+                    REMOVE
+                  </Button>
                 </Product>
               ))
             ) : (
@@ -101,19 +110,27 @@ function Cart({ tokenCookie, decodedSwr }) {
           </Info>
           <Summary>
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
-            <SummaryItem>
-              <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>$ {total_Cart}</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
-              <SummaryItemText>Estimated Shipping</SummaryItemText>
-              <SummaryItemPrice>$ {SHIPPING_FEE}</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem type="total">
-              <SummaryItemText>Total</SummaryItemText>
-              <SummaryItemPrice>$ {total_Cart + SHIPPING_FEE}</SummaryItemPrice>
-            </SummaryItem>
-            {tokenCookie && (
+            {productsAction?.length > 0 ? (
+              <>
+                <SummaryItem>
+                  <SummaryItemText>Subtotal</SummaryItemText>
+                  <SummaryItemPrice>$ {total_Cart}</SummaryItemPrice>
+                </SummaryItem>
+                <SummaryItem>
+                  <SummaryItemText>Estimated Shipping</SummaryItemText>
+                  <SummaryItemPrice>$ {SHIPPING_FEE}</SummaryItemPrice>
+                </SummaryItem>
+                <SummaryItem type="total">
+                  <SummaryItemText>Total</SummaryItemText>
+                  <SummaryItemPrice>
+                    $ {total_Cart + SHIPPING_FEE}
+                  </SummaryItemPrice>
+                </SummaryItem>
+              </>
+            ) : (
+              ""
+            )}
+            {tokenCookie && productsAction?.length > 0 && (
               <Button
                 onClick={createCheckoutSession}
                 variant="contained"
@@ -144,6 +161,14 @@ export async function getServerSideProps(context) {
     },
   };
 }
+
+const AddCustom = styled(Add)`
+  cursor: pointer;
+`;
+
+const RemoveCustom = styled(Remove)`
+  cursor: pointer;
+`;
 
 const Wrapper = styled.div`
   padding: 20px;

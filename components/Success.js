@@ -11,7 +11,7 @@ function Success() {
         Congratulation! Your order to be successful, we will contact you later.
       </SuccessTitle>
       <Button
-        variant="contain"
+        variant="contained"
         color="success"
         onClick={() => router.push("/")}
       >

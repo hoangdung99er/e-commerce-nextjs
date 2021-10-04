@@ -47,3 +47,17 @@ export const onAddCart = (newProduct, quantity, id, price) => ({
     price,
   },
 });
+
+export const onRemoveItemCart = (id) => ({
+  type: types.REMOVE_ITEM_CART,
+  payload: {
+    id,
+  },
+});
+
+export const onAddQuantity = (id) => ({
+  type: types.ADD_QUANTITY,
+  payload: {
+    id,
+  },
+});
