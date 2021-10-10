@@ -3,28 +3,40 @@ import { Button } from "@mui/material";
 import { Mobile } from "../../Reponsive";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { onEditProduct } from "../../store/actions/productAction";
 import { mutate } from "swr";
+import {
+  TextField,
+  Input as InputMui,
+  CircularProgress,
+  IconButton,
+} from "@mui/material";
+import Image from "next/image";
+import { PhotoCamera, SendOutlined } from "@material-ui/icons";
+import UploadImageHandle from "../../shared/UploadImage";
+import { products as productsReducer } from "../../store/reducers/products";
 
 function EditProduct({ products, pid, tokenCookie, setPId }) {
   const [product, setProduct] = useState({
     title: "",
     desc: "",
-    img: "",
     categories: "",
     size: "",
     color: "",
     price: 0,
   });
   const dispatch = useDispatch();
+  const [file, setFile] = useState(null);
+  const { isLoading, uploadImage } = UploadImageHandle();
+  const { isFetching } = useSelector(productsReducer);
 
   //Set value for state
   const handleChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
   };
 
-  // Handle Submit form login
+  // Handle Submit edit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -46,6 +58,12 @@ function EditProduct({ products, pid, tokenCookie, setPId }) {
     setProduct(products.find((product) => product._id === pid));
   }, [pid]);
 
+  const handleSubmitImage = (e) => {
+    e.preventDefault();
+
+    uploadImage({ file: file, label: "img" }, setProduct);
+  };
+
   return (
     <Container>
       <Wrapper>
@@ -64,17 +82,53 @@ function EditProduct({ products, pid, tokenCookie, setPId }) {
             name="desc"
             id="desc"
             value={product?.desc}
-            onChange={handleChange}
             type="text"
           />
-          <Input
-            placeholder="Image..."
-            name="img"
-            id="img"
+          <TextField
+            InputProps={{
+              readOnly: true,
+            }}
+            id="read-only-image"
             value={product?.img}
-            onChange={handleChange}
-            type="text"
           />
+          {file && (
+            <WrapperReviewImage>
+              <Image
+                src={URL.createObjectURL(file)}
+                width={200}
+                height={200}
+                layout="fixed"
+                alt="product image"
+              />
+              <Button
+                onClick={handleSubmitImage}
+                variant="contained"
+                endIcon={!isLoading && <SendOutlined />}
+              >
+                {isLoading ? (
+                  <CircularProgress color="inherit" size={20} />
+                ) : (
+                  "Send"
+                )}
+              </Button>
+            </WrapperReviewImage>
+          )}
+          <label htmlFor="icon-button-file">
+            <InputMui
+              onChange={(e) => setFile(e.target.files[0])}
+              accept="image/*"
+              id="icon-button-file"
+              type="file"
+              sx={{ display: "none" }}
+            />
+            <IconButton
+              color="primary"
+              aria-label="upload picture"
+              component="span"
+            >
+              <PhotoCamera />
+            </IconButton>
+          </label>
           <Input
             placeholder="Categories"
             name="categories"
@@ -108,7 +162,11 @@ function EditProduct({ products, pid, tokenCookie, setPId }) {
             type="number"
           />
           <Button type="submit" variant="contained">
-            Edit
+            {isFetching ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Edit"
+            )}
           </Button>
         </Form>
       </Wrapper>
@@ -129,7 +187,7 @@ const Container = styled.div`
 
 const Wrapper = styled.div`
   padding: 20px;
-  width: 25%;
+  width: 50%;
   background-color: white;
   ${Mobile({
     width: "75%",
@@ -150,4 +208,10 @@ const Input = styled.input`
   min-width: 40px;
   margin: 10px 0;
   padding: 10px;
+`;
+
+const WrapperReviewImage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;

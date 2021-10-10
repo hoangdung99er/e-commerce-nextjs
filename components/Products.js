@@ -1,15 +1,20 @@
 import styled from "styled-components";
 import { Product } from "../components";
 import { useEffect, useCallback, useState } from "react";
-import { onGetAllProduct } from "../store/actions/productAction";
-import { useDispatch } from "react-redux";
 
-function Products({ category, filters, sort, products }) {
+function Products({
+  category,
+  filters,
+  sort,
+  products,
+  tokenCookie,
+  decodedSwr,
+}) {
   const [filterProducts, setFilterProducts] = useState([]);
 
   useEffect(() => {
     setFilterProducts(
-      products.filter((item) =>
+      products?.filter((item) =>
         Object.entries(filters).every(([key, value]) =>
           item[key].includes(value)
         )
@@ -32,10 +37,24 @@ function Products({ category, filters, sort, products }) {
   return (
     <Container>
       {category
-        ? filterProducts?.map((item) => <Product item={item} key={item._id} />)
+        ? filterProducts?.map((item) => (
+            <Product
+              item={item}
+              key={item._id}
+              tokenCookie={tokenCookie}
+              decodedSwr={decodedSwr}
+            />
+          ))
         : products
             ?.slice(0, 7)
-            .map((item) => <Product item={item} key={item._id} />)}
+            .map((item) => (
+              <Product
+                item={item}
+                key={item._id}
+                tokenCookie={tokenCookie}
+                decodedSwr={decodedSwr}
+              />
+            ))}
     </Container>
   );
 }

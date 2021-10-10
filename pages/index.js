@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import React from "react";
 import Head from "next/head";
 import {
   Announcement,
@@ -9,16 +9,18 @@ import {
   Products,
   Newletter,
   Footer,
+  BackDrop,
 } from "../components";
+import { useSelector } from "react-redux";
 import jwt_decode from "jwt-decode";
 import { useRequestApi } from "../store/lib/useRequest";
+import { user as userAction } from "../store/reducers/user";
 
-export default function Home({ tokenCookie, decodedSwr }) {
+function Home({ tokenCookie, decodedSwr }) {
   const { data, error } = useRequestApi("/product/all");
 
   if (error) return <h1>Something went wrong!</h1>;
-  if (!data) return <h1>Loading...</h1>;
-  console.log(error);
+  if (!data) return <BackDrop data={data} />;
   return (
     <Container>
       <Head>
@@ -30,12 +32,19 @@ export default function Home({ tokenCookie, decodedSwr }) {
       <Header tokenCookie={tokenCookie} decodedSwr={decodedSwr} />
       <Slider />
       <Categories />
-      <Products filters={{}} products={data} />
+      <Products
+        filters={{}}
+        products={data}
+        tokenCookie={tokenCookie}
+        decodedSwr={decodedSwr}
+      />
       <Newletter />
       <Footer />
     </Container>
   );
 }
+
+export default React.memo(Home);
 
 const Container = styled.div`
   width: 100%;

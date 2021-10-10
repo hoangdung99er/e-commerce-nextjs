@@ -59,8 +59,6 @@ function ProductDetail({ tokenCookie, decodedSwr, product }) {
     });
   };
 
-  console.log(newProduct);
-
   const handleAddCart = () => {
     dispatch(
       onAddCart(newProduct, quantity, newProduct.id, product?.price * quantity)
@@ -119,7 +117,7 @@ function ProductDetail({ tokenCookie, decodedSwr, product }) {
               <Amount>{quantity}</Amount>
               <AddIconCustom onClick={handleAdd} />
             </AmountContainer>
-            {tokenCookie && (
+            {tokenCookie && !decodedSwr.isAdmin && (
               <Button onClick={handleAddCart}>Add to Cart</Button>
             )}
           </AddContainer>

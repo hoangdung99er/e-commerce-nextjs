@@ -1,28 +1,50 @@
-import {
-  FavoriteBorderOutlined,
-  SearchOutlined,
-  ShoppingCartOutlined,
-} from "@material-ui/icons";
+import { FavoriteBorderOutlined, SearchOutlined } from "@material-ui/icons";
 import { Mobile } from "../Reponsive";
 import styled from "styled-components";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { onAddFavoriteProduct } from "../store/actions/productAction";
+import {
+  addFavoriteProduct,
+  removeFavoriteProduct,
+} from "../store/actions/authAction";
+import { user } from "../store/reducers/user";
 
-function Product({ item }) {
+function Product({ item, tokenCookie, decodedSwr }) {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const { currentUser, favOfUser } = useSelector(user);
+  const handleAddFavorite = (pid) => {
+    if (favOfUser?.some(({ _id }) => _id === pid)) {
+      dispatch(removeFavoriteProduct(pid));
+    } else {
+      dispatch(addFavoriteProduct(item));
+    }
+    dispatch(onAddFavoriteProduct(pid, tokenCookie));
+  };
+
+  const checkFavorite = (pid) => {
+    return favOfUser?.some(({ _id }) => _id === pid);
+  };
+
   return (
     <Container>
       <Circle />
       <Image src={item.img} alt="" />
       <Info>
-        <Icon>
-          <ShoppingCartOutlined />
-        </Icon>
         <Icon onClick={() => router.push(`/product/${item._id}`)}>
           <SearchOutlined />
         </Icon>
-        <Icon>
-          <FavoriteBorderOutlined />
-        </Icon>
+        {tokenCookie && !decodedSwr?.isAdmin && (
+          <Icon onClick={() => setIsFavorite((prev) => !prev)}>
+            <FavoriteBorderOutlined
+              color={checkFavorite(item._id) ? "error" : "inherit"}
+              onClick={() => handleAddFavorite(item._id)}
+            />
+          </Icon>
+        )}
       </Info>
     </Container>
   );

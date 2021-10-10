@@ -15,10 +15,13 @@
     "@mui/x-data-grid": "^5.0.0-beta.2",
     "@stripe/stripe-js": "^1.19.0",
     "bcryptjs": "^2.4.3",
+    "buffer": "^5.6.0",
+    "firebase": "^9.1.1",
     "isomorphic-unfetch": "^3.1.0",
     "js-cookie": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.1.2",
+    "micro": "^9.3.4",
     "mongoose": "^6.0.7",
     "next": "11.1.2",
     "react": "17.0.2",
@@ -26,10 +29,12 @@
     "react-redux": "^7.2.5",
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
+    "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "stripe": "^8.176.0",
     "styled-components": "^5.3.1",
-    "swr": "^1.0.1"
+    "swr": "^1.0.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@emotion/react": "^11.4.1",

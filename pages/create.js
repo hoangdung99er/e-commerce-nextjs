@@ -1,29 +1,47 @@
 import Head from "next/head";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import Button from "@mui/material/Button";
+import {
+  Button,
+  IconButton,
+  Input as InputMui,
+  CircularProgress,
+} from "@mui/material";
 import { onCreateProduct } from "../store/actions/productAction";
 import styled from "styled-components";
 import { Mobile } from "../Reponsive";
 import { useState } from "react";
 import jwt_decode from "jwt-decode";
+import { PhotoCamera, SendOutlined } from "@material-ui/icons";
+import Image from "next/image";
+import UploadImageHandle from "../shared/UploadImage";
+import { products } from "../store/reducers/products";
 
 function Create({ tokenCookie }) {
   const [product, setProduct] = useState({
     title: "",
     desc: "",
-    img: "",
     categories: "",
     size: "",
     color: "",
     price: "",
   });
+  const [file, setFile] = useState(null);
   const router = useRouter();
   const dispatch = useDispatch();
+  const { isLoading, uploadImage, count } = UploadImageHandle();
+  const { isFetching } = useSelector(products);
 
   //Set value for state
   const handleChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
+  };
+
+  // Create image and upload image to storage cloud firebase
+  const handleSubmitImage = (e) => {
+    e.preventDefault();
+
+    uploadImage({ file: file, label: "img" }, setProduct);
   };
 
   // Handle Submit form login
@@ -57,14 +75,44 @@ function Create({ tokenCookie }) {
             onChange={handleChange}
             type="text"
           />
-          <Input
-            placeholder="Image..."
-            name="img"
-            id="img"
-            value={product.img}
-            onChange={handleChange}
-            type="text"
-          />
+          {file && (
+            <WrapperReviewImage>
+              <Image
+                src={URL.createObjectURL(file)}
+                width={200}
+                height={200}
+                layout="fixed"
+                alt="product image"
+              />
+              <Button
+                onClick={handleSubmitImage}
+                variant="contained"
+                endIcon={!isLoading && <SendOutlined />}
+              >
+                {isLoading ? (
+                  <CircularProgress color="inherit" size={20} />
+                ) : (
+                  "Send"
+                )}
+              </Button>
+            </WrapperReviewImage>
+          )}
+          <label htmlFor="icon-button-file">
+            <InputMui
+              onChange={(e) => setFile(e.target.files[0])}
+              accept="image/*"
+              id="icon-button-file"
+              type="file"
+              sx={{ display: "none" }}
+            />
+            <IconButton
+              color="primary"
+              aria-label="upload picture"
+              component="span"
+            >
+              <PhotoCamera />
+            </IconButton>
+          </label>
           <Input
             placeholder="Categories"
             name="categories"
@@ -97,8 +145,21 @@ function Create({ tokenCookie }) {
             onChange={handleChange}
             type="number"
           />
-          <Button type="submit" variant="contained">
-            Create
+          <Button
+            disabled={!Object.entries(product).every(([key, value]) => value)}
+            type="submit"
+            variant="contained"
+            sx={{
+              "& .MuiButton-root:disabled": {
+                cursor: "not-allowed",
+              },
+            }}
+          >
+            {isFetching ? (
+              <CircularProgress color="inherit" size={20} />
+            ) : (
+              "Create"
+            )}
           </Button>
         </Form>
       </Wrapper>
@@ -125,7 +186,7 @@ const Container = styled.div`
 
 const Wrapper = styled.div`
   padding: 20px;
-  width: 25%;
+  width: 50%;
   background-color: white;
   ${Mobile({
     width: "75%",
@@ -141,6 +202,13 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
 `;
+
+const WrapperReviewImage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const Input = styled.input`
   flex: 1;
   min-width: 40px;

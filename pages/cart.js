@@ -10,7 +10,13 @@ import { useRouter } from "next/router";
 import { Button } from "@mui/material";
 import { loadStripe } from "@stripe/stripe-js";
 import fetch from "isomorphic-unfetch";
-import { onAddQuantity, onRemoveItemCart } from "../store/actions/cartAction";
+import { user } from "../store/reducers/user";
+import {
+  onAddQuantity,
+  onRemoveItemCart,
+  onDeleteItemCart,
+  clearCart,
+} from "../store/actions/cartAction";
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
 
 let SHIPPING_FEE = 2;
@@ -21,6 +27,7 @@ function Cart({ tokenCookie, decodedSwr }) {
   const total_Cart = useSelector(total);
   const router = useRouter();
   const dispatch = useDispatch();
+  const { currentUser } = useSelector(user);
   const SERVER_DOMAIN = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
 
   const createCheckoutSession = async () => {
@@ -28,22 +35,28 @@ function Cart({ tokenCookie, decodedSwr }) {
 
     const checkoutSession = await fetch(`${SERVER_DOMAIN}/stripe/payment`, {
       method: "POST",
-      body: JSON.stringify({ items: productsAction }),
+      body: JSON.stringify({
+        items: productsAction,
+        userId: currentUser?._id,
+        token: tokenCookie,
+      }),
       headers: {
         Authorization: "Bearer " + process.env.NEXT_PUBLIC_STRIPE_PR_KEY,
-        "Content-Type": "application/json ",
+        "Content-Type": "application/json",
       },
     });
 
+    const data = await checkoutSession.json();
+    data && dispatch(clearCart());
+
     const result = await stripe.redirectToCheckout({
-      sessionId: checkoutSession.id,
+      sessionId: data.id,
     });
 
     if (result.error) {
       alert(result.error.message);
     }
   };
-  console.log(productsAction);
 
   return (
     <>
@@ -61,7 +74,6 @@ function Cart({ tokenCookie, decodedSwr }) {
           </TopButton>
           <TopTexts>
             <TopText>Shopping Bag({quantityAction})</TopText>
-            <TopText>Your Wishlist(0)</TopText>
           </TopTexts>
         </Top>
         <Bottom>
@@ -99,7 +111,11 @@ function Cart({ tokenCookie, decodedSwr }) {
                     </ProductAmountContainer>
                     <ProductPrice>$ {product.price}</ProductPrice>
                   </PriceDetail>
-                  <Button variant="contained" color="error">
+                  <Button
+                    onClick={() => dispatch(onDeleteItemCart(product.id))}
+                    variant="contained"
+                    color="error"
+                  >
                     REMOVE
                   </Button>
                 </Product>
@@ -130,7 +146,7 @@ function Cart({ tokenCookie, decodedSwr }) {
             ) : (
               ""
             )}
-            {tokenCookie && productsAction?.length > 0 && (
+            {tokenCookie && productsAction?.length > 0 && !decodedSwr.isAdmin && (
               <Button
                 onClick={createCheckoutSession}
                 variant="contained"

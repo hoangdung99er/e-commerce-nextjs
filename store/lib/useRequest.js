@@ -1,11 +1,18 @@
 import useSWR from "swr";
 import fetch from "isomorphic-unfetch";
-import { Error } from "mongoose";
 
 const fetcher = async (url) => {
   const response = await fetch(url);
   const data = await response.json();
   return data;
+};
+const fetcherPost = async (url, token) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  });
 };
 const baseUrl = "http://localhost:3000/api";
 

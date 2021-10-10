@@ -29,11 +29,11 @@ async function handler(req, res) {
 
       if (req.auth.id === id || req.auth.isAdmin) {
         try {
-          const user = await User.findById(id);
+          const user = await User.findById(id).select(
+            "-username -email -password -isAdmin -_id"
+          );
 
-          const { password: psw, ...others } = user._doc;
-
-          res.status(200).json(others);
+          res.status(200).json(user);
         } catch (error) {
           res.status(500).json(error);
         }

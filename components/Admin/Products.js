@@ -5,6 +5,8 @@ import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { mutate } from "swr";
 import { onDeleteProduct } from "../../store/actions/productAction";
+import Image from "next/image";
+import styled from "styled-components";
 
 function Products({ products, handleId, tokenCookie }) {
   const columns = [
@@ -32,6 +34,20 @@ function Products({ products, handleId, tokenCookie }) {
       sortable: false,
 
       width: 250,
+      renderCell: (params) => {
+        return (
+          <ImageCustomWrapper>
+            <Image
+              loading="lazy"
+              layout="fixed"
+              width={70}
+              height={80}
+              alt=""
+              src={params.row.img}
+            />
+          </ImageCustomWrapper>
+        );
+      },
     },
     {
       field: "categories",
@@ -130,5 +146,11 @@ function Products({ products, handleId, tokenCookie }) {
     </div>
   );
 }
+
+const ImageCustomWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 export default React.memo(Products);

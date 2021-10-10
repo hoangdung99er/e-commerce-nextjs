@@ -20,6 +20,16 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isFavorite: [
+      { type: mongoose.Types.ObjectId, ref: "Product", required: false },
+    ],
+    isCart: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Product",
+        required: false,
+      },
+    ],
   },
   { timestamps: true }
 );

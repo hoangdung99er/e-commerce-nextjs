@@ -5,6 +5,7 @@ import {
   Products,
   Newletter,
   Footer,
+  BackDrop,
 } from "../components";
 import Head from "next/head";
 import { Mobile } from "../Reponsive";
@@ -26,7 +27,7 @@ function ProductLists({ tokenCookie, decodedSwr }) {
   };
 
   if (error) return <h1>Something went wrong!</h1>;
-  if (!data) return <h1>Loading...</h1>;
+  if (!data) return <BackDrop data={data} />;
 
   return (
     <Container>
@@ -70,6 +71,8 @@ function ProductLists({ tokenCookie, decodedSwr }) {
         sort={sort}
         filters={filters}
         products={data}
+        tokenCookie={tokenCookie}
+        decodedSwr={decodedSwr}
       />
       <Newletter />
       <Footer />

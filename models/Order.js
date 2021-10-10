@@ -8,8 +8,15 @@ const OrderSchema = new mongoose.Schema(
     },
     products: [
       {
-        productId: {
-          type: String,
+        product: {
+          id: { type: String },
+          title: { type: String },
+          desc: { type: String },
+          img: { type: String },
+          categories: { type: Array },
+          size: { type: String },
+          color: { type: String },
+          price: { type: Number },
         },
         quantity: {
           type: Number,

@@ -17,7 +17,18 @@ async function handler(req, res) {
         res.status(500).json(error);
       }
     case "POST":
-      const newOrder = new Order(req.body);
+      const { userId, product, amount, quantity, address } = req.body;
+      const newOrder = new Order({
+        userId: userId,
+        products: [
+          {
+            product: product,
+            quantity: quantity,
+          },
+        ],
+        amount: amount,
+        address: address,
+      });
 
       if (req.auth) {
         try {

@@ -1,20 +1,50 @@
 import styled from "styled-components";
-import { Search, ShoppingCartOutlined } from "@material-ui/icons";
-import { Badge } from "@material-ui/core";
+import {
+  Search,
+  ShoppingCartOutlined,
+  FavoriteBorderOutlined,
+} from "@material-ui/icons";
+import {
+  Badge,
+  IconButton,
+  Popover,
+  Typography,
+  Box,
+  Avatar,
+  Stack,
+} from "@mui/material";
 import { Mobile, Tablet } from "../Reponsive";
 import { useRouter } from "next/router";
 import cookie from "js-cookie";
 import { quantity } from "../store/reducers/cart";
-import { useSelector } from "react-redux";
-import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import React, { useState } from "react";
+import { clearError } from "../store/actions/authAction";
+import { user } from "../store/reducers/user";
 
 function Header({ tokenCookie, decodedSwr }) {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const quantityAction = useSelector(quantity);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const { favOfUser } = useSelector(user);
+
   const handleLogout = () => {
     cookie.remove("token");
     router.push("/login");
+    dispatch(clearError());
   };
-  const quantityAction = useSelector(quantity);
+
+  const handleClick = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
   return (
     <div>
@@ -35,6 +65,76 @@ function Header({ tokenCookie, decodedSwr }) {
             </Logo>
           </Center>
           <Right>
+            {tokenCookie && !decodedSwr?.isAdmin && (
+              <>
+                <IconButton
+                  aria-describedby={id}
+                  onClick={handleClick}
+                  aria-label="favorite"
+                  color="primary"
+                >
+                  <FavoriteBorderOutlined />
+                </IconButton>
+                <Popover
+                  id={id}
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleClose}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "left",
+                  }}
+                  sx={{ overflowX: "auto" }}
+                >
+                  {favOfUser?.length > 0 ? (
+                    favOfUser?.map((product) => (
+                      <Stack
+                        sx={{
+                          height: 100,
+                          "&:hover": {
+                            backgroundColor: "lightgray",
+                            cursor: "pointer",
+                          },
+                        }}
+                        key={product._id}
+                        justifyContent="center"
+                        alignItems="center"
+                        direction="row"
+                        spacing={2}
+                        onClick={() => router.push(`/product/${product._id}`)}
+                      >
+                        <Avatar
+                          alt={product.title}
+                          src={product.img}
+                          sx={{ width: 50, height: 50, ml: 1 }}
+                        />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexDirection: "column",
+                            width: "100%",
+                          }}
+                        >
+                          <Typography variant="body1">
+                            {product.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontStyle: "italic" }}
+                          >
+                            {product.categories.map((cate) => cate)}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    ))
+                  ) : (
+                    <Typography>No product of your favorite</Typography>
+                  )}
+                </Popover>
+              </>
+            )}
             {tokenCookie ? (
               <>
                 {decodedSwr?.isAdmin ? (

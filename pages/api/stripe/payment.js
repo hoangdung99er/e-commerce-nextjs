@@ -1,9 +1,9 @@
 const stripe = require("stripe")(process.env.NEXT_PUBLIC_STRIPE_PR_KEY);
 
 export default async function (req, res) {
-  const { items } = req.body;
+  const { items, userId, token } = req.body;
 
-  const transformedItems = items.map(({ product, quantity }) => ({
+  const transformedItems = items?.map(({ product, quantity }) => ({
     price_data: {
       currency: "vnd",
       product_data: {
@@ -23,7 +23,19 @@ export default async function (req, res) {
     success_url: `${process.env.NEXT_PUBLIC_HOST}/success`,
     cancel_url: `${process.env.NEXT_PUBLIC_HOST}/cart`,
     metadata: {
-      images: JSON.stringify(items.map(({ product }) => product.img)),
+      userId,
+      token,
+      productId: JSON.stringify(items?.map(({ product }) => product.id)),
+      title: JSON.stringify(items?.map(({ product }) => product.title)),
+      desc: JSON.stringify(items?.map(({ product }) => product.desc)),
+      images: JSON.stringify(items?.map(({ product }) => product.img)),
+      color: JSON.stringify(items?.map(({ product }) => product.color)),
+      size: JSON.stringify(items?.map(({ product }) => product.size)),
+      price: JSON.stringify(items?.map(({ product }) => product.price)),
+      quantity: JSON.stringify(items?.map(({ quantity }) => quantity)),
+      categories: JSON.stringify(
+        items?.map(({ product }) => product.categories)
+      ),
     },
     shipping_address_collection: {
       allowed_countries: ["VN", "GB", "US", "CA"],

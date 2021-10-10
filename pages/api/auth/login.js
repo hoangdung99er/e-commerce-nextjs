@@ -2,6 +2,7 @@ import dbConnect from "../../../utils/dbConnect";
 import User from "../../../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import Product from "../../../models/Product";
 
 dbConnect();
 
@@ -11,8 +12,11 @@ export default async (req, res) => {
 
   switch (method) {
     case "POST":
+      let user;
       try {
-        const user = await User.findOne({ username: username });
+        user = await User.findOne({ username: username })
+          .select("-username -email -isAdmin")
+          .populate("isFavorite");
 
         if (!user) {
           return res.status(400).json({
@@ -30,25 +34,25 @@ export default async (req, res) => {
           });
         }
 
-        const { password: psw, ...others } = user._doc;
-
         const token = jwt.sign(
           { isAdmin: user.isAdmin, userId: user._id },
           `${process.env.NEXT_PUBLIC_SECRET_KEY}`,
           { expiresIn: "2d" }
         );
+        const { password: psw, ...others } = user._doc;
 
         res.status(200).json({
-          message: "Login successfully",
           user: others,
           token,
         });
       } catch (error) {
-        res.status(400).json({ success: false });
+        res
+          .status(400)
+          .json({ success: false, message: "Something went wrong" });
       }
       break;
     default:
-      res.status(400).json({ success: false });
+      res.status(400).json({ success: false, message: "Error Server" });
       break;
   }
 };

@@ -3,16 +3,18 @@ import { createStore, applyMiddleware } from "redux";
 import thunkMiddleware from "redux-thunk";
 import reducers from "./reducers";
 import { composeWithDevTools } from "redux-devtools-extension";
-
-// export default configureStore({
-//   reducer: {
-//     user: userReducer,
-//     product: productReducer,
-//     cart: cartReducer,
-//   },
-// });
+import { persistReducer } from "redux-persist";
+import storage from "./config/storage";
 
 let store;
+
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["cart"],
+};
+
+const persistedReducer = persistReducer(persistConfig, reducers);
 
 const bindMiddleware = (middleware) => {
   if (process.env.NODE_ENV !== "production") {
@@ -22,7 +24,11 @@ const bindMiddleware = (middleware) => {
 };
 
 function initStore(initialState) {
-  return createStore(reducers, initialState, bindMiddleware([thunkMiddleware]));
+  return createStore(
+    persistedReducer,
+    initialState,
+    bindMiddleware([thunkMiddleware])
+  );
 }
 
 export const initializeStore = (preloadedState) => {

@@ -30,8 +30,6 @@ export const onGetCart = (token) => {
       const response = await apiCall("cart/all", "GET", null, {
         Authorization: "Bearer " + token,
       });
-
-      dispatch({});
     } catch (error) {
       console.log(error);
     }
@@ -60,4 +58,15 @@ export const onAddQuantity = (id) => ({
   payload: {
     id,
   },
+});
+
+export const onDeleteItemCart = (id) => ({
+  type: types.DELETE_ITEM_CART,
+  payload: {
+    id,
+  },
+});
+
+export const clearCart = () => ({
+  type: types.CLEAR_CART,
 });

@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import Head from "next/head";
-import { Header } from "../components";
+import { Header, BackDrop } from "../components";
 import jwt_decode from "jwt-decode";
 import ProductsAdmin from "../components/Admin/Products";
 import EditProductAdmin from "../components/Admin/EditProduct";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState } from "react";
 import { useRequestApi } from "../store/lib/useRequest";
 
 function Admin({ tokenCookie, decodedSwr }) {
@@ -16,7 +16,7 @@ function Admin({ tokenCookie, decodedSwr }) {
   };
 
   if (error) return <h1>Something went wrong...</h1>;
-  if (!data) return <h1>Loading...</h1>;
+  if (!data) return <BackDrop data={data} />;
 
   return (
     <Container>

@@ -6,11 +6,15 @@ import Link from "next/link";
 import { onSignIn } from "../store/actions/authAction";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import { Button } from "@mui/material";
+import { user as userAction } from "../store/reducers/user";
+import { CircularProgress, Alert } from "@mui/material";
 
 function Login() {
   const [user, setUser] = useState({ username: "", password: "" });
   const dispatch = useDispatch();
   const router = useRouter();
+  const { isFetching, error, currentUser, success } = useSelector(userAction);
 
   //Set value for state
   const handleChange = (e) => {
@@ -48,7 +52,14 @@ function Login() {
             onChange={handleChange}
             type="password"
           />
-          <Button type="submit">Login</Button>
+          {error ? (
+            <Alert severity="error">{error}</Alert>
+          ) : (
+            <>{success && <Alert severity="success">Success login!</Alert>}</>
+          )}
+          <CustomButton variant="contained" disabled={isFetching} type="submit">
+            {isFetching ? <CircularProgress size={20} /> : "Login"}
+          </CustomButton>
           <LinkRef href="/">Remember the password?</LinkRef>
           <LinkRef href="/register">Create a new account</LinkRef>
         </Form>
@@ -118,15 +129,8 @@ const Input = styled.input`
   padding: 10px;
 `;
 
-const Button = styled.button`
-  width: 40%;
-  border: none;
-  padding: 15px 20px;
-  background-color: teal;
-  color: white;
-  cursor: pointer;
-  outline: none;
-  margin-bottom: 10px;
+const CustomButton = styled(Button)`
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 `;
 
 const LinkRef = styled(Link)`

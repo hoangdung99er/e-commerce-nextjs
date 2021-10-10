@@ -15,11 +15,6 @@ export default async function apiCall(
       headers: headers,
     });
 
-    if (!response.ok) {
-      err.message = "Cannot fetching data, wait!";
-      return err;
-    }
-
     const responseData = await response.json();
 
     return responseData;
